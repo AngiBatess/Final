@@ -5,6 +5,7 @@
   <meta charset="utf-8">
   <title>Spritesheet animation method</title>
   <!-- <link rel="stylesheet" href="weatherAPIkey.js"> -->
+
   <style media="screen">
     body{position: relative;}
     #canvas1 {
@@ -28,6 +29,7 @@
 <body>
   <p class="weather"></p>
   <canvas id="canvas1" width="900" height="200"></canvas>
+<script src="weatherAPIkey.js" charset="utf-8"></script>
   <script type="text/javascript">
 
     //create image file variable reference
@@ -80,7 +82,7 @@
         xhr.send()
       }
     }
-    const apiKey = 'a250d16cfbb852a3a9b44fdac38dace6'
+    // const apiKey = 'a250d16cfbb852a3a9b44fdac38dace6'
     let lat, lon
     let p = document.querySelector('p.weather')
     let weather = {};
