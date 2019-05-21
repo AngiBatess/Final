@@ -77,7 +77,7 @@
       if (imagesLoaded === imageAssetCount) {
         ////move to next activity
         startAnimating()
-        // xhr.send()
+        xhr.send()
       }
     }
     const apiKey = 'a250d16cfbb852a3a9b44fdac38dace6'
@@ -263,24 +263,32 @@
       let skyX
       let sunMoonDx
       let sunMoonDy
-
-    if (daytime){
-        sun.dx = 100
-        sun.dy = 50
-        context.drawImage(
-          skyImage,
-          sun.sx, sun.sy, sun.spriteW, sun.spriteH,
-          sunMoonDx, sunMoonDy, sun.spriteW, sun.spriteH
-        )
+      if (daytime) {
+        sunMoon = sunImage
+        skyX = 0
+        positionPercentage = (dt - sunrise) / (sunset - sunrise)
       } else {
-        moon.dx = 100
-        moon.dy = 50
-        context.drawImage(
-          nightSkyImage,
-          moon.sx, moon.sy, moon.spriteW, moon.spriteH,
-          sunMoonDx, sunMoonDy, moon.spriteW, moon.spriteH
-        )
+        sunMoon = moonImage
+        skyX = 900
+        positionPercentage = (dt - sunset) / (sunset - sunrise)
       }
+    // if (daytime){
+    //     sun.dx = 100
+    //     sun.dy = 50
+    //     context.drawImage(
+    //       skyImage,
+    //       sun.sx, sun.sy, sun.spriteW, sun.spriteH,
+    //       sunMoonDx, sunMoonDy, sun.spriteW, sun.spriteH
+    //     )
+    //   } else {
+    //     moon.dx = 100
+    //     moon.dy = 50
+    //     context.drawImage(
+    //       nightSkyImage,
+    //       moon.sx, moon.sy, moon.spriteW, moon.spriteH,
+    //       sunMoonDx, sunMoonDy, moon.spriteW, moon.spriteH
+    //     )
+    //   }
 
     const cw = canvas.width
     const ch = canvas.height
