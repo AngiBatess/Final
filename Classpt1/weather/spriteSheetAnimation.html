@@ -7,7 +7,8 @@
   <!-- <link rel="stylesheet" href="weatherAPIkey.js"> -->
 
   <style media="screen">
-    body{position: relative;}
+    body{position: relative;
+    background-image: url(grass.jpeg);}
     #canvas1 {
       width: 900px;
       height: 200px;
@@ -21,7 +22,10 @@
     .weather{
       width: 800px;
       margin: 1em auto;
-      font-family: sans-serif;
+      font-family: lucida console;
+      color: white;
+      font-size: 36px;
+      text-align: center;
     }
   </style>
 </head>
@@ -347,9 +351,9 @@
           let lightning = 0
           let mistWeather = false
           let thunderstorm = false
-          // let weatherCode = weather.weather[0].icon.substring(0,2)
+          let weatherCode = weather.weather[0].icon.substring(0,2)
           //have the one above for real time and one below for testing it out
-          let weatherCode = "01"
+          // let weatherCode = "50"
           switch (weatherCode) {
             case "01":
             //clear sky
