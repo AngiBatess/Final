@@ -49,13 +49,13 @@
     skyImage.src = "WeatherArt/DayScene.png"
     cloudImage.src = "WeatherArt/DayCloud1.png"
     // uniImage.src = "unicorn050719.png"
-    sunImage.src = "WeatherArt/SunSprite.png"
-    moonImage.src = "WeatherArt/MoonPhases2.png"
+    sunImage.src = "WeatherArt/Sunn.png"
+    moonImage.src = "WeatherArt/MoonPhases.png"
     nightcloudImage.src = "WeatherArt/NightCloud2.png"
     lightningImage.src = "WeatherArt/Lightning_.png"
     rainImage.src = "WeatherArt/DayRain.png"
     mistImage.src = "WeatherArt/NightMist.png"
-    snowImage.src = "WeatherArt/DaySnow.png"
+    snowImage.src = "WeatherArt/NightSnow.png"
     nightSkyImage.src = "WeatherArt/NightScene.png"
 
     //the sprite sheet file itself
@@ -78,7 +78,7 @@
       imagesLoaded++
       if (imagesLoaded === imageAssetCount) {
         ////move to next activity
-        startAnimating()
+        // startAnimating()
         xhr.send()
       }
     }
@@ -123,7 +123,8 @@
         str = `${location}  ${temp}&#0176;  wind: ${wind}mph<br>${time}<br>${timeString}`
 
         p.innerHTML = str
-        plot()
+        // console.log(`${weather}`);
+        startAnimating()
       } else {
         p.textContent = "Error code: " + xhr.status
       }
@@ -144,6 +145,8 @@
       currentFrame: 0,
       frames: 1,
       cols: 1,
+      increment: 0,
+      animationSpeed: 9,
 
       update: function() {
         //allows for simple horizontal and vertical movement
@@ -170,9 +173,13 @@
         this.sx = Math.floor(this.currentFrame % this.cols) * this.spriteW
         this.sy = Math.floor(this.currentFrame / this.cols) * this.spriteH
         this.currentFrame = this.currentFrame + 1
-        if (this.currentFrame == this.frames) {
-          this.currentFrame = 0
+        this.increment = (this.increment + 1) % this.animationSpeed
+        if (this.increment === 0){
+        this.currentFrame = (this.currentFrame + 1) % this.frames
         }
+        // if (this.currentFrame == this.frames) {
+        //   this.currentFrame = 0
+        // }
         // this.currentFrame = (this.currentFrame + 1) % this.frames
       }
     }
@@ -188,30 +195,30 @@
     // uni.vx = 1
 
     let sun = Object.create(Sprite)
-    sun.spriteW = 233
-    sun.spriteH = 230
-    sun.dy = 200 - sun.spriteH
-    sun.frames = 3
-    sun.cols = 3
+    sun.spriteW = 140
+    sun.spriteH = 140
+    // sun.dy = 200 - sun.spriteH
+    sun.frames = 9
+    sun.cols = 4
     sun.vx = 1
 
 
     let moon = Object.create(Sprite)
-    moon.spriteW = 144
-    moon.spriteH = 144
-    moon.dy = 200 - sun.spriteH
-    moon.frames = 3
-    moon.cols = 3
-    moon.vx = 1
+    moon.spriteW = 140
+    moon.spriteH = 140
+    // moon.dy = 200 - sun.spriteH
+    moon.frames = 9
+    moon.cols = 4
+    moon.vx = 0
 
     let clouds = []
-    for (var i = 0; i < 100; i++) {
+    for (var i = 0; i < 80; i++) {
       clouds[i] = Object.create(Sprite)
       //because the cloud is a single frame
       //it doesn't need to declare frames and cols
       clouds[i].spriteW = 700
       clouds[i].spriteH = 700
-      clouds[i].dx = Math.random() * 900
+      clouds[i].dx = Math.random() * 700
       clouds[i].dy = Math.random() * 140
       clouds[i].vx = -1
     }
@@ -219,12 +226,33 @@
     let nightcloud = []
     for (var i = 0; i < 100; i++){
       nightcloud[i] = Object.create(Sprite)
-      nightcloud[i].spriteW = 700
-      nightcloud[i].spriteH = 700
-      nightcloud[i].dx = Math.random() * 900
+      nightcloud[i].spriteW = 400
+      nightcloud[i].spriteH = 400
+      nightcloud[i].dx = Math.random() * 300
       nightcloud[i].dy = Math.random() * 140
       nightcloud[i].vx = -1
     }
+
+    let rain = []
+    for (var i = 0; i < 20; i++){
+      rain[i] = Object.create(Sprite)
+      rain[i].spriteW = 300
+      rain[i].spriteH = 300
+      rain[i].dx = Math.random() * 900
+      rain[i].dy = Math.random() * 140
+      rain[i].vy = 1
+    }
+
+    let snow = []
+    for (var i = 0; i < 200; i++){
+      snow[i] = Object.create(Sprite)
+      snow[i].spriteW = 700
+      snow[i].spriteH = 700
+      snow[i].dx = Math.random() * 900
+      snow[i].dy = Math.random() * 140
+      snow[i].vy = 1
+    }
+
 
     const canvas = document.querySelector('#canvas1')
     const context = canvas.getContext('2d')
@@ -256,7 +284,7 @@
       let ssd = new Date(sunset*1000)
       let srd = new Date(sunrise*1000)
 
-      let positionPercentage
+
       //sky hours are 72px wide
       let time = new Date(weather.dt * 1000)
       let hrs = time.getHours()
@@ -265,39 +293,57 @@
       let skyX
       let sunMoonDx
       let sunMoonDy
+      let dayNight
       if (daytime) {
+        // sunMoon = moonImage
+        // dayNight = nightSkyImage
         sunMoon = sunImage
-        skyX = 0
+        dayNight = skyImage
+        // skyX = 0
         positionPercentage = (dt - sunrise) / (sunset - sunrise)
       } else {
         sunMoon = moonImage
-        skyX = 900
+        dayNight = nightSkyImage
+        // skyX = 900
         positionPercentage = (dt - sunset) / (sunset - sunrise)
       }
+      sunMoonDy = positionPercentage<0.5?200-positionPercentage*200*2 : 2*(positionPercentage-0.5)*200
+      sunMoonDx = positionPercentage * 900
+      // console.log(positionPercentage);
     // if (daytime){
-    //     sun.dx = 100
-    //     sun.dy = 50
-    //     context.drawImage(
-    //       skyImage,
-    //       sun.sx, sun.sy, sun.spriteW, sun.spriteH,
-    //       sunMoonDx, sunMoonDy, sun.spriteW, sun.spriteH
-    //     )
+    //   //draw day sky
+    //   0,0,900,200,
+    //   0,0,900,200
+    //   draw sunmoon
+    //     sun.display()
     //   } else {
-    //     moon.dx = 100
-    //     moon.dy = 50
     //     context.drawImage(
     //       nightSkyImage,
     //       moon.sx, moon.sy, moon.spriteW, moon.spriteH,
     //       sunMoonDx, sunMoonDy, moon.spriteW, moon.spriteH
     //     )
+    //     moon.display()
     //   }
+      context.drawImage(
+        dayNight,
+        0,0,900,200,
+        0,0,900,200
+      )
+      context.drawImage(
+        sunMoon,
+        sun.sx, sun.sy, sun.spriteW, sun.spriteH,
+        sunMoonDx, sunMoonDy, sun.spriteW, sun.spriteH
+      )
+      sun.display()
+      moon.display()
 
     const cw = canvas.width
     const ch = canvas.height
     //PROCESS WEATHER CONDITION DATA
-          numClouds = 0
-          numRain = 0
-          numSnow = 0
+          let numClouds = 0
+          let numNightClouds = 0
+          let numRain = 0
+          let numSnow = 0
           let lightning = 0
           let mistWeather = false
           let thunderstorm = false
@@ -323,23 +369,23 @@
               break;
             case "09":
             //shower rain
-              numClouds = 100
-              numRain = 200
+              numClouds = 10
+              numRain = 20
               break;
             case "10":
             //rain
-              numClouds = 200
-              numRain = 400
+              numClouds = 10
+              numRain = 20
               break;
             case "11":
             //thunderstorm
               thunderstorm = true
               lightning = 50
-              numClouds = 200
+              numClouds = 10
               break;
             case "13":
             //snow
-              numClouds = 100
+              numClouds = 10
               numSnow = 200
               break;
             case "50":
@@ -352,24 +398,24 @@
           }
 
       //draw sky
-      context.drawImage(
-        skyImage,
-        0, 0, 900, 200,
-        0, 0, cw, ch
-      )
-      //night time
-      context.drawImage(
-        nightSkyImage,
-        0,0,900,200,
-        0,0,cw,ch
-      )
+      // context.drawImage(
+      //   skyImage,
+      //   0, 0, 900, 200,
+      //   0, 0, cw, ch
+      // )
+      // //night time
+      // context.drawImage(
+      //   nightSkyImage,
+      //   0,0,900,200,
+      //   0,0,cw,ch
+      // )
       //DRAW RAIN
       for (var i = 0; i < numRain; i++) {
         rain[i].update()
         context.drawImage(
           rainImage,
           rain[i].sx, rain[i].sy, rain[i].spriteW, rain[i].spriteH,
-          rain[i].dx, rain[i].dy, rain[i].spriteW, rain[i].spriteH
+          rain[i].dx, rain[i].dy, (rain[i].spriteW/4), (rain[i].spriteH/4)
         )
       }
 
@@ -403,7 +449,11 @@
         )
       }
       //draw numClouds
-      let numClouds = 10
+      if (!daytime){
+        numNightClouds = numClouds
+        numClouds = 0
+      }
+      // let numClouds = 10
       for (var i = 0; i < numClouds; i++) {
         clouds[i].update()
         //no need to call display because the cloud is not updating
@@ -414,7 +464,6 @@
         )
       }
       //draw night num clouds
-      let numNightClouds = 10
       for (var i = 0; i < numNightClouds; i++) {
         nightcloud[i].update()
         //no need to call display because the cloud is not updating
@@ -435,23 +484,23 @@
       // requestAnimationFrame(startAnimating)
 
       //draw sun
-      context.drawImage(
-        sunImage,
-        sun.sx, sun.sy, sun.spriteW, sun.spriteH,
-        sun.dx, sun.dy + 8, sun.spriteW, sun.spriteH
-      )
-      sun.update()
-      sun.display()
-      requestAnimationFrame(startAnimating)
+      // context.drawImage(
+      //   sunImage,
+      //   sun.sx, sun.sy, sun.spriteW, sun.spriteH,
+      //   sun.dx, sun.dy + 8, sun.spriteW, sun.spriteH
+      // )
+      // sun.update()
+      // sun.display()
 
-      //draw moon
-      context.drawImage(
-        moonImage,
-        moon.sx, moon.sy, moon.spriteW, moon.spriteH,
-        moon.dx, moon.dy + 8, moon.spriteW, moon.spriteH
-      )
-      moon.update()
-      moon.display()
+      // //draw moon
+      // context.drawImage(
+      //   moonImage,
+      //   moon.sx, moon.sy, moon.spriteW, moon.spriteH,
+      //   moon.dx, moon.dy + 8, moon.spriteW, moon.spriteH
+      // )
+      // moon.update()
+      // moon.display()
+      // requestAnimationFrame(startAnimating)
       requestAnimationFrame(startAnimating)
 
 
